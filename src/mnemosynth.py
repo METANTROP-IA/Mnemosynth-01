@@ -475,7 +475,7 @@ def infer_process(
 ):
     """Main inference process"""
     # Split the input text into batches
-    audio, sr = torchaudio.load(ref_audio)
+    audio, sr = torchaudio.load(ref_audio, backend="soundfile")
     max_chars = int(len(ref_text.encode("utf-8")) / (audio.shape[-1] / sr) * (25 - audio.shape[-1] / sr))
     gen_text_batches = chunk_text(gen_text, max_chars=max_chars)
     for i, gen_text in enumerate(gen_text_batches):
@@ -719,7 +719,7 @@ def infer(
         with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as f:
             sf.write(f.name, final_wave, final_sample_rate)
             remove_silence_for_generated_wav(f.name)
-            final_wave, _ = torchaudio.load(f.name)
+            final_wave, _ = torchaudio.load(f.name, backend="soundfile")
         final_wave = final_wave.squeeze().cpu().numpy()
 
     # Save the spectrogram
